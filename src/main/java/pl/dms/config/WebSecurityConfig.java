@@ -3,6 +3,7 @@ package pl.dms.config;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -18,16 +19,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(createCordConfigurationSource());
-        http.authorizeRequests()
-            .antMatchers(LoginServiceRestController.LOGIN_URL + "/testRequest").permitAll()
+        http.csrf().disable()
+            .authorizeRequests()
+            .antMatchers(LoginServiceRestController.LOGIN_URL).permitAll()
             .antMatchers("/").permitAll()
-            .anyRequest().authenticated();
+            .anyRequest().authenticated()
+            .and()
+            .httpBasic();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+            .withUser("user")
+            .password("password")
+            .roles("USER");
     }
 
     private CorsConfigurationSource createCordConfigurationSource() {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowCredentials(false);
+            config.setAllowCredentials(true);
             // TODO add appropriate origins
             config.setAllowedOrigins(Arrays.asList("*"));
             config.addAllowedHeader("*");
@@ -35,5 +47,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return config;
         };
     }
-
 }
