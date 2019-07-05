@@ -8,7 +8,7 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
+@Entity(name = "t_user")
 public class User {
 
     @Id

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import pl.dms.dao.UserDao;
 import pl.dms.model.User;
 
-@Service
+@Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
