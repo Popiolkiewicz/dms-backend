@@ -48,28 +48,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.cors().configurationSource(createCordConfigurationSource());
-//        http.csrf().disable()
-//            .authorizeRequests()
-//            .antMatchers(LoginServiceRestController.LOGIN_URL).permitAll()
-//            .antMatchers("/").permitAll()
-//            .anyRequest().authenticated()
-//            .and()
-//            .httpBasic();
-//    }
-//
-//    private CorsConfigurationSource createCordConfigurationSource() {
-//        return request -> {
-//            CorsConfiguration config = new CorsConfiguration();
-//            config.setAllowCredentials(true);
-//            // TODO add appropriate origins
-//            config.setAllowedOrigins(Arrays.asList("*"));
-//            config.addAllowedHeader("*");
-//            config.addAllowedMethod("*");
-//            return config;
-//        };
-//    }
 }
