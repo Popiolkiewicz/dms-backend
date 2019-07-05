@@ -1,39 +1,75 @@
 package pl.dms.config;
 
-import java.util.Arrays;
+import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-
-import pl.dms.api.rest.LoginServiceRestController;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    @Qualifier(value = "userService")
+    private UserDetailsService userDetailsService;
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Autowired
+    public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().configurationSource(createCordConfigurationSource());
-        http.authorizeRequests()
-            .antMatchers(LoginServiceRestController.LOGIN_URL + "/testRequest").permitAll()
-            .antMatchers("/").permitAll()
-            .anyRequest().authenticated();
+        http.csrf().disable().exceptionHandling()
+                .authenticationEntryPoint(
+                        (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                .and().authorizeRequests().antMatchers("/**").authenticated().and().httpBasic();
     }
 
-    private CorsConfigurationSource createCordConfigurationSource() {
-        return request -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowCredentials(false);
-            // TODO add appropriate origins
-            config.setAllowedOrigins(Arrays.asList("*"));
-            config.addAllowedHeader("*");
-            config.addAllowedMethod("*");
-            return config;
-        };
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.cors().configurationSource(createCordConfigurationSource());
+//        http.csrf().disable()
+//            .authorizeRequests()
+//            .antMatchers(LoginServiceRestController.LOGIN_URL).permitAll()
+//            .antMatchers("/").permitAll()
+//            .anyRequest().authenticated()
+//            .and()
+//            .httpBasic();
+//    }
+//
+//    private CorsConfigurationSource createCordConfigurationSource() {
+//        return request -> {
+//            CorsConfiguration config = new CorsConfiguration();
+//            config.setAllowCredentials(true);
+//            // TODO add appropriate origins
+//            config.setAllowedOrigins(Arrays.asList("*"));
+//            config.addAllowedHeader("*");
+//            config.addAllowedMethod("*");
+//            return config;
+//        };
+//    }
 }
