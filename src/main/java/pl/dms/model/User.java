@@ -8,6 +8,9 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -17,9 +20,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "t_user")
-public class User extends BaseId implements UserDetails {
+public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private long id;
+
     private String email;
     private String username;
     private String password;
@@ -35,10 +44,18 @@ public class User extends BaseId implements UserDetails {
     private boolean credentialsNonExpired;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "role_user", joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "id") }, inverseJoinColumns = {
-                    @JoinColumn(name = "role_id", referencedColumnName = "id") })
+    @JoinTable(name = "t_user_role", joinColumns = {
+            @JoinColumn(name = "user_fk", referencedColumnName = "user_id") }, inverseJoinColumns = {
+                    @JoinColumn(name = "role_fk", referencedColumnName = "role_id") })
     private List<Role> roles;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     @Override
     public boolean isEnabled() {
@@ -93,10 +110,6 @@ public class User extends BaseId implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void setId(long id) {
-        super.id = id;
     }
 
 }
