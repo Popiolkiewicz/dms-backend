@@ -43,7 +43,7 @@ INSERT INTO T_USER (
 ) 
 VALUES 
 (
-	'admin','{bcrypt}$2a$10$0AoLlR7Af1E1T5dV/0JpVeUtclqZBqtXqDsTWeIOizAySJAhCJwN.',
+	'admin','{bcrypt}$2a$10$Lychcv4/A91ognzaSO3gceovqsBW7HCtCsahYyO.R.iUcrW2zufXu',
 	'admin@examplemail.com','Y','N','N','N'
 ),
 (
